@@ -1,8 +1,10 @@
 package com.ContactManagement.services;
 
 import com.ContactManagement.data.model.Contact;
+import com.ContactManagement.data.model.User;
 import com.ContactManagement.data.repositories.ContactRepo;
-import com.ContactManagement.dto.Request.AddContactRequest;
+import com.ContactManagement.data.repositories.UserRepo;
+import com.ContactManagement.dto.Request.*;
 import com.ContactManagement.dto.Response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,18 +22,26 @@ public class ContactServicesImpl implements ContactService {
         this.contactRepo = contactRepo;
     }
 
-
     @Override
     public AddContactResponse addContact(AddContactRequest request) {
+        User user = new User();
         Contact contact = new Contact();
-        contact.setFirstName(request.getFirstName());
-        contact.setLastName(request.getLastName());
-        contact.setEmail(request.getEmail());
-        contact.setAddress(request.getAddress());
+        contact.setId(request.getUserId());
+        contact.setFirstName(request.getFirstName().toLowerCase());
+        contact.setLastName(request.getLastName().toLowerCase());
+        contact.setEmail(request.getEmail().toLowerCase());
+        contact.setAddress(request.getAddress().toLowerCase());
         contact.setPhoneNumber(request.getPhoneNumber());
-        contactRepo.save(contact);
+        user.getListOfContacts().add(contact);
+        Contact newContact = contactRepo.save(contact);
         AddContactResponse addContactResponse = new AddContactResponse();
+        addContactResponse.setGetId(newContact.getId());
         addContactResponse.setMessage("Successfully added contact");
+        addContactResponse.setFirstName(request.getFirstName().toLowerCase());
+        addContactResponse.setLastName(request.getLastName().toLowerCase());
+        addContactResponse.setEmail(request.getEmail().toLowerCase());
+        addContactResponse.setAddress(request.getAddress().toLowerCase());
+        addContactResponse.setPhoneNumber(request.getPhoneNumber());
         return addContactResponse;
     }
 
@@ -52,12 +62,11 @@ public class ContactServicesImpl implements ContactService {
         createNewContact(contact);
         for (Contact contacts : contactRepo.findAll()) {
             if (contacts == null) {
-                throw new NullPointerException("Contactlist is empty");
+                throw new NullPointerException("Contact list is empty");
             } else {
                 response.setMessage("All contacts found");
             }
         }
-
         return response;
     }
 
@@ -76,95 +85,77 @@ public class ContactServicesImpl implements ContactService {
         return response;
     }
 
+    @Override
+    public FindContactByPhoneNumberResponse findContactByPhoneNumber(FindContactByPhoneNumberRequest request) {
+        Contact contact = contactRepo.findByPhoneNumber(request.getPhoneNumber());
+        FindContactByPhoneNumberResponse response = new FindContactByPhoneNumberResponse();
+        if (contact != null) {
+            response.setAddress(contact.getAddress());
+            response.setFirstName(contact.getFirstName());
+            response.setLastName(contact.getLastName());
+            response.setEmail(contact.getEmail());
+            response.setPhoneNumber(contact.getPhoneNumber());
+            response.setMessage("Contact found");
+            return response;
+        }
+        else{
+            throw new NullPointerException("Contact not found");
+            }
+    }
 
-    public RemoveContactByPhoneNumberResponse validateAndDeleteContactByPhoneNumber(String phoneNumber) {
-        List<Contact> contact = contactRepo.findByPhoneNumber(phoneNumber.toLowerCase());
-
-        RemoveContactByPhoneNumberResponse response = new RemoveContactByPhoneNumberResponse();
-
-        if (contact != null && !contact.isEmpty()) {
-            response.setMessage("Contact Deleted");
-            contactRepo.deleteByPhoneNumber(phoneNumber);
+    public FindContactByNameResponse findContactByName(FindContactByNameRequest request, FindContactByNameRequest request2) {
+        Contact contacts = contactRepo.findContactByFirstNameAndLastName(request.getFirstName().toLowerCase(), request2.getLastName().toLowerCase());
+        FindContactByNameResponse response = new FindContactByNameResponse();
+        if (contacts != null) {
+            response.setMessage("Contact found");
+            response.setAddress(contacts.getAddress());
+            response.setFirstName(contacts.getFirstName());
+            response.setLastName(contacts.getLastName());
+            response.setEmail(contacts.getEmail());
+            response.setPhone(contacts.getPhoneNumber());
         }
         else {
             throw new NullPointerException("Contact not found");
         }
-        return response;
-
+            return response;
     }
 
-    public List<FindContactByPhoneNumberResponse> findContactByPhoneNumber(String request) {
-
-        List<Contact> contacts = contactRepo.findByPhoneNumber(request);
-
-        List<FindContactByPhoneNumberResponse> responses = new ArrayList<>();
-
-        for (Contact details : contacts) {
-            FindContactByPhoneNumberResponse response = new FindContactByPhoneNumberResponse(
-                    details.getLastName(),
-                    details.getFirstName(),
-                    details.getEmail(),
-                    details.getAddress()
-            );
-
-            responses.add(response);
-        }
-
-        return responses;
-    }
-
-    public List<FindContactByNameResponse> findContactByName(String firstName, String lastName) {
-        List<Contact> contacts = contactRepo.findContactByFirstNameAndLastName(firstName.toLowerCase(), lastName.toLowerCase());
-
-        List<FindContactByNameResponse> responses = new ArrayList<>();
-
-        for (Contact details : contacts) {
-            FindContactByNameResponse response = new FindContactByNameResponse(
-                    details.getLastName(),
-                    details.getFirstName(),
-                    details.getEmail(),
-                    details.getAddress()
-            );
-            responses.add(response);
-        }
-        return responses;
-    }
-
-    public RemoveContactByNameResponse validateAndDeleteContactByName(String firstName, String lastName) {
+    public RemoveContactByNameResponse validateAndDeleteContactByName(RemoveContactByNameRequest request, RemoveContactByNameRequest request2) {
         RemoveContactByNameResponse response = new RemoveContactByNameResponse();
-        List<Contact> contact = contactRepo.findContactByFirstNameAndLastName(firstName.toLowerCase(), lastName.toLowerCase());
-
-        if (contact != null && !contact.isEmpty()) {
+        Contact contact = contactRepo.findContactByFirstNameAndLastName(request.getFirstName().toLowerCase(), request2.getLastName().toLowerCase());
+        if (contact != null) {
             response.setMessage("Contact Deleted");
-            contactRepo.deleteContactByFirstNameAndLastName(firstName.toLowerCase(), lastName.toLowerCase());
-        }
-        else {
-           throw new NullPointerException("Contact not found");
+            contactRepo.delete(contact);
+        } else {
+            throw new NullPointerException("Contact not found");
         }
         return response;
     }
 
-    public List<FindContactByEmailResponse> findContactByEmail(String email) {
-        List<Contact> contacts = contactRepo.findByEmail(email.toLowerCase());
-        List<FindContactByEmailResponse> responses = new ArrayList<>();
-        for (Contact details : contacts) {
-            FindContactByEmailResponse response = new FindContactByEmailResponse(
-                    details.getLastName(),
-                    details.getFirstName(),
-                    details.getEmail(),
-                    details.getAddress()
-            );
-            responses.add(response);
+    public FindContactByEmailResponse findContactByEmail(FindContactByEmailRequest request) {
+        FindContactByEmailResponse response = new FindContactByEmailResponse();
+        Contact contacts = contactRepo.findByEmail(request.getEmail().toLowerCase());
+        if (contacts != null) {
+            response.setFirstName(contacts.getFirstName());
+            response.setLastName(contacts.getLastName());
+            response.setEmail(contacts.getEmail());
+            response.setPhone(contacts.getPhoneNumber());
+            response.setAddress(contacts.getAddress());
+            response.setMessage("Contact found");
+            return response;
         }
-        return responses;
+        else{
+            throw new NullPointerException("Contact not found");
+        }
+
     }
 
-    public RemoveContactByEmailResponse validateAndDeleteContactByEmail(String email) {
+    public RemoveContactByEmailResponse validateAndDeleteContactByEmail(RemoveContactByEmailRequest request) {
         RemoveContactByEmailResponse response = new RemoveContactByEmailResponse();
-        response.setMessage("Contact Deleted");
-        List<Contact> contact = contactRepo.findByEmail(email.toLowerCase());
-        if (contact != null && !contact.isEmpty()) {
-            contactRepo.deleteByEmail(email);
+        Contact contact = contactRepo.findByEmail(request.getEmail().toLowerCase());
+        if (contact != null) {
+            contactRepo.delete(contact);
+            response.setMessage("Contact Deleted");
         }
         else {
             throw new NullPointerException("Contact not found");
@@ -172,28 +163,32 @@ public class ContactServicesImpl implements ContactService {
         return response;
     }
 
-    public List<FindContactByAddressResponse> findContactByAddress(String address) {
-        List<Contact> contacts = contactRepo.findByAddress(address.toLowerCase());
-        List<FindContactByAddressResponse> responses = new ArrayList<>();
-        for (Contact details : contacts) {
-            FindContactByAddressResponse response = new FindContactByAddressResponse(
-                    details.getLastName(),
-                    details.getFirstName(),
-                    details.getEmail(),
-                    details.getAddress()
-            );
-            responses.add(response);
+    public FindContactByAddressResponse findContactByAddress(FindContactByAddressRequest request) {
+        Contact contacts = contactRepo.findByAddress(request.getAddress().toLowerCase());
+        FindContactByAddressResponse responses = new FindContactByAddressResponse();
+        if (contacts != null) {
+            responses.setMessage("Contact found");
+            responses.setAddress(contacts.getAddress());
+            responses.setFirstName(contacts.getFirstName());
+            responses.setLastName(contacts.getLastName());
+            responses.setEmail(contacts.getEmail());
+            responses.setPhone(contacts.getPhoneNumber());
+        }
+            else {
+                throw new NullPointerException("Contact not found");
         }
         return responses;
     }
 
-    public RemoveContactByAddressResponse validateAndDeleteContactByAddress(String address) {
+    public RemoveContactByAddressResponse validateAndDeleteContactByAddress(RemoveContactByAddressRequest request) {
         RemoveContactByAddressResponse response = new RemoveContactByAddressResponse();
         response.setMessage("Contact Deleted");
-        List<Contact> contact = contactRepo.findByAddress(address.toLowerCase());
-        if (contact != null && !contact.isEmpty()) {
-            contactRepo.deleteByAddress(address);
-        }
+        Contact contact = contactRepo.findByAddress(request.getAddress().toLowerCase());
+        if (contact != null) {
+            contactRepo.delete(contact);
+            response.setMessage("Contact Deleted");
+         }
+
         else {
             throw new NullPointerException("Contact not found");
         }
@@ -204,20 +199,41 @@ public class ContactServicesImpl implements ContactService {
         return contactRepo.count();
     }
 
-    public UpdateContactResponse updateContact(String firstName, String newPhoneNumber, String lastName, String newEmail) {
-        List<Contact> contacts = contactRepo.findContactByFirstNameAndLastName(firstName, lastName);
+    public UpdateContactResponse updateContact(UpdateContactRequest validateOldFirstName, UpdateContactRequest validateOldLastName) {
+        Contact contacts = contactRepo.findContactByFirstNameAndLastName(validateOldFirstName.getFirstName().toLowerCase(), validateOldLastName.getLastName().toLowerCase());
+        UpdateContactRequest newRequest = new UpdateContactRequest();
         UpdateContactResponse response = new UpdateContactResponse();
-            for (Contact contact : contacts) {
-                if (contact.getFirstName().equalsIgnoreCase(firstName)) {
-                    contact.getPhoneNumber().equalsIgnoreCase(newPhoneNumber);
-                    contact.getEmail().equalsIgnoreCase(newEmail);
-                    contactRepo.save(contact);
-                    response.setMessage("Contact Updated");
-                }
-            }
+        if (contacts != null) {
+            newRequest.setFirstName(contacts.getFirstName());
+            newRequest.setLastName(contacts.getLastName());
+            newRequest.setEmail(contacts.getEmail());
+            newRequest.setPhoneNumber(contacts.getPhoneNumber());
+            newRequest.setAddress(contacts.getAddress());
+            contactRepo.save(contacts);
+            response.setAddress(newRequest.getAddress());
+            response.setFirstName(newRequest.getFirstName());
+            response.setLastName(newRequest.getLastName());
+            response.setEmail(newRequest.getEmail());
+            response.setPhoneNumber(newRequest.getPhoneNumber());
+            response.setMessage("Updated Successfully");
+        } else {
+            throw new NullPointerException("Contact not found");
+        }
         return response;
     }
 
+    public RemoveContactByPhoneNumberResponse validateAndDeleteContactByPhoneNumber(RemoveContactByPhoneNumberRequest request){
+        RemoveContactByPhoneNumberResponse response = new RemoveContactByPhoneNumberResponse();
+        Contact contact = contactRepo.findByPhoneNumber(request.getPhoneNumber().toLowerCase());
+        if (contact != null) {
+            response.setMessage("Contact Deleted");
+            contactRepo.delete(contact);
+        }
+        else{
+            throw new NullPointerException("Contact not found");
+        }
+        return response;
+    }
 
 
 

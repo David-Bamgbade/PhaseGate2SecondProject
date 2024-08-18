@@ -9,10 +9,7 @@ import java.util.List;
 
 @Repository
 public interface UserRepo extends MongoRepository<User, String> {
-
-    User save(User user);
-
-    void delete(User user);
+    User findByUserId(String userId);
 
     User findByUserName(String username);
 
@@ -20,9 +17,13 @@ public interface UserRepo extends MongoRepository<User, String> {
 
     User findByUserNameAndPassword(String username, String password);
 
-    List<User> findByEmailAndPassword(String userName, String password);
+    User findByEmailAndPassword(String userName, String password);
 
     User findByPassword(String password);
+
+    User findByPhoneNumber(String phoneNumber);
+
+
 
 
 

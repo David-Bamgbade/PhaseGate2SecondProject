@@ -1,13 +1,11 @@
 package com.ContactManagement.dto.Request;
 
 import lombok.*;
-@Builder
+
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-
-
 public class FindContactByPhoneNumberRequest {
 
     private String message;

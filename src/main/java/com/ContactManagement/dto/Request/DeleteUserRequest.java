@@ -2,11 +2,9 @@ package com.ContactManagement.dto.Request;
 
 import lombok.*;
 
-@Builder
 @Setter
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+
 
 public class DeleteUserRequest {
     private String Id;

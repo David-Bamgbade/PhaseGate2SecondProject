@@ -1,32 +1,31 @@
 package com.ContactManagement.services;
 
-import com.ContactManagement.dto.Request.AddContactRequest;
+import com.ContactManagement.data.model.User;
+import com.ContactManagement.dto.Request.*;
 import com.ContactManagement.dto.Response.*;
-
-import java.util.List;
 
 
 public interface ContactService {
-    AddContactResponse addContact(AddContactRequest request);
+   AddContactResponse addContact(AddContactRequest request);
     DisplayAllContactsResponse findAllContacts();
     RemoveAllContactsResponse deleteAllContacts();
-    List <FindContactByEmailResponse> findContactByEmail(String email);
+    FindContactByEmailResponse findContactByEmail(FindContactByEmailRequest request);
 
-    List<FindContactByNameResponse> findContactByName(String firstName, String lastName);
-    RemoveContactByPhoneNumberResponse validateAndDeleteContactByPhoneNumber(String phoneNumber);
+ FindContactByPhoneNumberResponse findContactByPhoneNumber(FindContactByPhoneNumberRequest request);
 
-    public List<FindContactByPhoneNumberResponse> findContactByPhoneNumber(String request);
+ FindContactByNameResponse findContactByName(FindContactByNameRequest firstName, FindContactByNameRequest request);
+    RemoveContactByPhoneNumberResponse validateAndDeleteContactByPhoneNumber(RemoveContactByPhoneNumberRequest request);
 
-    RemoveContactByNameResponse validateAndDeleteContactByName (String firstName, String lastName);
+    RemoveContactByNameResponse validateAndDeleteContactByName (RemoveContactByNameRequest firstName, RemoveContactByNameRequest lastName);
 
-    RemoveContactByEmailResponse validateAndDeleteContactByEmail(String email);
+    RemoveContactByEmailResponse validateAndDeleteContactByEmail(RemoveContactByEmailRequest request);
 
-    List<FindContactByAddressResponse> findContactByAddress(String address);
+    FindContactByAddressResponse findContactByAddress(FindContactByAddressRequest request);
 
-    RemoveContactByAddressResponse validateAndDeleteContactByAddress(String address);
+    RemoveContactByAddressResponse validateAndDeleteContactByAddress(RemoveContactByAddressRequest request);
 
     long countNumberOfContacts();
 
-    public UpdateContactResponse updateContact(String firstName, String newPhoneNumber, String lastName, String newEmail);
+    UpdateContactResponse updateContact(UpdateContactRequest request, UpdateContactRequest request1);
 
 }

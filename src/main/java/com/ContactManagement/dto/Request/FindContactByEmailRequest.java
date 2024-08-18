@@ -3,9 +3,6 @@ package com.ContactManagement.dto.Request;
 import lombok.*;
 
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Setter
 
 public class FindContactByEmailRequest {

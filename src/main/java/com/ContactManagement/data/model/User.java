@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -13,21 +14,22 @@ import java.util.List;
 
 public class User {
     @Id
-    private String id;
+    private String userId;
     private String email;
     private String password;
     private String message;
-//    private String name;
-//    private String surname;
-//    private String phoneNumber;
-//    private String address;
-//    private String age;
-//    private String gender;
+    private String name;
+    private String surname;
+    private String phoneNumber;
+    private String address;
+    private String age;
+    private String gender;
     private String userName;
+    private String firstName;
+    private String lastName;
 
-    @Setter
-    @Getter
-    private boolean loggedIn;
+    @DBRef
+    private List<Contact> listOfContacts = new ArrayList<Contact>();
 
 
 }

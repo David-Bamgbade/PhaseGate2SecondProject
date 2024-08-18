@@ -1,2 +1,12 @@
-package com.ContactManagement.dto.Request;public class UpdatePasswordRequest {
+package com.ContactManagement.dto.Request;
+
+import lombok.*;
+
+@Getter
+@Setter
+
+
+public class UpdatePasswordRequest {
+    private String Password;
+    private String message;
 }

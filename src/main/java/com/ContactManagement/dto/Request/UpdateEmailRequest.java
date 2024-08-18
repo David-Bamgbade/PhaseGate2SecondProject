@@ -1,2 +1,10 @@
-package com.ContactManagement.dto.Request;public class UpdateEmailRequest {
+package com.ContactManagement.dto.Request;
+
+import lombok.*;
+
+@Setter
+@Getter
+
+public class UpdateEmailRequest {
+    private String email;
 }

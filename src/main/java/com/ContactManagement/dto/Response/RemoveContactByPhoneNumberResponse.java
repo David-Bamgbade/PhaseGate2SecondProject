@@ -1,16 +1,14 @@
 package com.ContactManagement.dto.Response;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
 
-@Builder
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Setter
 
-
-
 public class RemoveContactByPhoneNumberResponse {
+    @Id
+    private String id;
     private String message;
     private String firstName;
     private String lastName;

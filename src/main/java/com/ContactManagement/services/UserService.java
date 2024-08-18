@@ -1,26 +1,28 @@
 package com.ContactManagement.services;
-import com.ContactManagement.dto.Request.SignupUserRequest;
-import com.ContactManagement.dto.Response.DeleteUserResponse;
-import com.ContactManagement.dto.Response.SignupUserResponse;
-import com.ContactManagement.dto.Response.UpdateEmailResponse;
-import com.ContactManagement.dto.Response.UpdatePasswordResponse;
+import com.ContactManagement.data.model.User;
+import com.ContactManagement.dto.Request.*;
+import com.ContactManagement.dto.Response.*;
 
 public interface UserService {
+    public User findByUserId(AddContactRequest addToContactRequest);
 
     SignupUserResponse signupUser(SignupUserRequest request);
 
     public long countUsers();
 
-    boolean loginUser(String email, String password);
+    LoginResponse loginUser(LoginRequest email, LoginRequest password);
 
-    public Boolean logoutUser(String email);
+     LogoutUserResponse logoutUser(LogoutRequest email);
 
-    public UpdateEmailResponse updateEmail(String currentEmail, String newEmail);
+    public UpdateEmailResponse updateEmail(UpdateEmailRequest request, String newEmail);
 
-    public UpdatePasswordResponse updatePassword(String currentPassword, String newPassword);
+    public UpdatePasswordResponse updatePassword(UpdatePasswordRequest request, String newPassword);
 
-    public DeleteUserResponse deleteUser(String email);
+    public DeleteUserResponse deleteUser(DeleteUserRequest email);
 
+    AddContactResponse userAddContact(AddContactRequest request);
+
+    RemoveContactByPhoneNumberResponse deleteContactByPhoneNumber(RemoveContactByPhoneNumberRequest request);
 
 
 }

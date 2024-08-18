@@ -7,4 +7,6 @@ import lombok.*;
 
 public class LogoutUserResponse {
     private String message;
+    private boolean loggedIn;
+
 }
